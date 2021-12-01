@@ -1,0 +1,25 @@
+{
+  "name": "navy-sea-cadet-dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard requested by the US Navy Sea Cadets",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CHSCodeForChange/Navy-Sea-Cadet-Dashboard.git"
+  },
+  "author": "CHSCodeForChange",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CHSCodeForChange/Navy-Sea-Cadet-Dashboard/issues"
+  },
+  "homepage": "https://github.com/CHSCodeForChange/Navy-Sea-Cadet-Dashboard#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.15"
+  }
+}
