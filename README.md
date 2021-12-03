@@ -5,6 +5,8 @@
 2. Clone this repository with
     `git clone https://github.com/CHSCodeForChange/Navy-Sea-Cadet-Dashboard.git`
 3. Go to the folder and run `npm install` to install dependencies
-4. Run `npm start`. The server will automatically refresh as you make changes.
-5. Access the server at http://localhost:8000 in any browser
-6. Stop the server with CTRL+C
+4. Create a file named `config.json`, inside it fill out the following information:
+``
+5. Run `npm start`. The server will automatically refresh as you make changes.
+6. Access the server at http://localhost:8000 in any browser
+7. Stop the server with CTRL+C

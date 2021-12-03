@@ -2,11 +2,15 @@
 //by copying and pasting the code
 module.exports = function(app) {
   var controller = require('../controllers/apicontroller');
+  var announcements = require('../controllers/annoucementsapi.js');
 
   // copy paste these to make a new route
   app.route('/api/getlist') //Handle request for [domain]/api/getlist
-    .get(controller.example_task)
+    .get(controller.example_task);
 
   app.route('/api/cadet/:userid') //Handle request for [domain]/api/cadet/[user_id]
-    .get(controller.get_cadet_info)
+    .get(controller.get_cadet_info);
+
+  app.route('/api/announcementslist')
+    .get(announcements.get_announcements_list);
 };
