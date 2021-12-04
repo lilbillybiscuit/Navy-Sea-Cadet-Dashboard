@@ -14,3 +14,9 @@ routes(app); //register the route
 app.listen(port);
 
 console.log('CFC API server started on: http://localhost:' + port);
+
+process.on('SIGINT', function() {
+    console.log("Stopping server...");
+    process.exit();
+});
+
