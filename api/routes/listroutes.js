@@ -1,3 +1,5 @@
+const con = null;
+
 //Don't worry about any of this function stuff, just add any routes below
 //by copying and pasting the code
 module.exports = function(app) {
@@ -11,6 +13,11 @@ module.exports = function(app) {
   app.route('/api/cadet/:userid') //Handle request for [domain]/api/cadet/[user_id]
     .get(controller.get_cadet_info);
 
-  app.route('/api/announcementslist')
+  app.route('/api/announcementsrange')
     .get(announcements.get_announcements_list);
+  app.route('/api/announcementsone')
+    .get(announcements.get_announcement);
+  app.route('/api/add_announcement')
+    .post(announcements.add_announcement);
+  
 };
