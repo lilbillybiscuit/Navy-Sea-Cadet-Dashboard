@@ -1,10 +1,8 @@
 var mysql = require('mysql2');
-var util = require('util');
 var fs = require('fs');
 
 let rawdata = fs.readFileSync('config.json');
 let config = JSON.parse(rawdata);
-console.log(config);
 
 const pool = mysql.createPool({
   host: config.database.host,
