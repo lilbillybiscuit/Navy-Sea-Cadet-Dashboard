@@ -22,6 +22,14 @@ exports.get_announcements_list = async function(request, result) {
   var minimum = amount*page, maximum = minimum+amount-1;
   var announcements = await poolpromise.query("SELECT * FROM test WHERE id BETWEEN ? AND ?", [minimum, maximum]);
   announcements = annoucements[0];
+  if (announcements == null) {
+    result.json({
+      success: false,
+      message: "Nothing has been posted yet",
+      messageshort: "NoMessage"
+    });
+    return;
+  }
   var ret = {
         date: new Date(),
         elements: [],
@@ -37,6 +45,13 @@ exports.get_announcements_list = async function(request, result) {
     ret.elements.push(temp);
   }
 
+  for (var i=0; i<ret.elements.length; i++) {
+    var temp = {
+      title: ret.elements,
+      summary: "hi"
+    }
+    ret.elements.push(temp);
+  }
   // console.log(temp);
   // for (var i=0; i<temp[0].length; i++) {
   //   console.log(temp[0][i]);
@@ -59,7 +74,7 @@ exports.get_announcement = async function(request, result) {
     dateadded: announcement.dateadded,
     content: announcement.data.content,
   }
-  return.json(ret);
+  ret.json(ret);
 }
 
 exports.add_announcement = async function(request, result) {
@@ -86,14 +101,14 @@ exports.add_announcement = async function(request, result) {
   if (verify.length === 0) {
     result.json({
       sucesss:false,
-      message: "Invalid token";
+      message: "Invalid token",
     });
     return;
   }
   if (verify.access_level <1) {
     result.json({
       sucesss:false,
-      message: "Insufficient permissions";
+      message: "Insufficient permissions",
     });
     return;
   }
@@ -112,6 +127,7 @@ exports.add_announcement = async function(request, result) {
     content: announcement.content,
     imageurl: 'imageurl' in announcement? annoucement.imageurl: null,
   })]);
+
 
   result.json({
     success: true,

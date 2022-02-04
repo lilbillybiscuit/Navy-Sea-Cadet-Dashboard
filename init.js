@@ -27,7 +27,7 @@ con.query("CREATE DATABASE IF NOT EXISTS "+databasename+";",
 
 con.query(`CREATE TABLE IF NOT EXISTS ${databasename}.users (username VARCHAR(30) PRIMARY KEY, userid INTEGER NOT NULL, passwordsha512 VARCHAR(128) NOT NULL, name VARCHAR(60), data JSON)`);
 con.query(`CREATE TABLE IF NOT EXISTS ${databasename}.announcements (id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL, title VARCHAR(250) NOT NULL, summary VARCHAR(500), dateadded DATETIME, data JSON)`);
-con.query(`CREATE TABLE IF NOT EXISTS ${databasename}.profiles (id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL, name VARCHAR(50), data JSON)`);
+con.query(`CREATE TABLE IF NOT EXISTS ${databasename}.profiles (id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL, name VARCHAR(50), branch VARCHAR(50), data JSON)`);
 con.query(`CREATE TABLE IF NOT EXISTS ${databasename}.calendar (date DATETIME, data JSON)`)
 con.query(`CREATE TABLE IF NOT EXISTS ${databasename}.tokens (token CHAR(64) PRIMARY KEY NOT NULL, expires DATETIME, access_level INTEGER)`)
 con.query(`CREATE TABLE IF NOT EXISTS ${databasename}.test (num INTEGER, token VARCHAR(64))`);
