@@ -15,7 +15,6 @@ const pool = mysql.createPool({
   decimalNumbers: true
 });
 const poolpromise = pool.promise();
-
 exports.get_announcements_list = async function(request, result) {
   var page = request.query.page;
   var amount = request.query.amount;
