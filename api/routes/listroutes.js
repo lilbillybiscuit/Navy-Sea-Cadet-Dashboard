@@ -5,6 +5,7 @@ const con = null;
 module.exports = function(app) {
   var controller = require('../controllers/apicontroller');
   var announcements = require('../controllers/annoucementsapi.js');
+  var loginapi = require('../controllers/loginapi.js');
 
   // copy paste these to make a new route
   app.route('/api/getlist') //Handle request for [domain]/api/getlist
@@ -19,5 +20,6 @@ module.exports = function(app) {
     .get(announcements.get_announcement);
   app.route('/api/add_announcement')
     .post(announcements.add_announcement);
-  
+  app.route('/api/authenicate')
+    .post(loginapi.authenticate);
 };
