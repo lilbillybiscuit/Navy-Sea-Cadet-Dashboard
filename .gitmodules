@@ -1,0 +1,3 @@
+[submodule "NavyApp"]
+	path = NavyApp
+	url = https://github.com/CHSCodeForChange/NavyApp.git
