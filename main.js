@@ -7,11 +7,11 @@ var express = require('express'),
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(session({
+/*app.use(session({
 	secret: 'ny39n245c8c2298n3oiuh2nt0s',
 	resave: true,
 	saveUninitialized: true
-}));
+}));*/
 
 
 var routes = require('./api/routes/listroutes'); //importing route

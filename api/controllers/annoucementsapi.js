@@ -4,17 +4,9 @@ var fs = require('fs');
 let rawdata = fs.readFileSync('config.json');
 let config = JSON.parse(rawdata);
 
-const pool = mysql.createPool({
-  host: config.database.host,
-  user: config.database.user,
-  password: config.database.password,
-  database: config.database.database,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  decimalNumbers: true
-});
+const pool = require("../db");
 const poolpromise = pool.promise();
+
 exports.get_announcements_list = async function(request, result) {
   var page = request.query.page;
   var amount = request.query.amount;

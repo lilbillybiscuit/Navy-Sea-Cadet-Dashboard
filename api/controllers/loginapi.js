@@ -4,6 +4,8 @@ var fs = require('fs');
 let rawdata = fs.readFileSync('config.json');
 let config = JSON.parse(rawdata);
 
+const pool = mysql.creat
+
 const connection = mysql.createConnection({
 	host     : config.database.host,
 	user     : config.database.user,
