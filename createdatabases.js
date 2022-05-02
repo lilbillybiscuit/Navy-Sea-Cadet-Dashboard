@@ -20,12 +20,11 @@ async function main() {
         email varchar(100) NOT NULL,
         data JSON);`);
     await connection.execute(`CREATE TABLE IF NOT EXISTS sessions (
-        id BIGINT NOT NULL PRIMARY KEY,
+        token varchar(100) NOT NULL PRIMARY KEY,
         expires DATETIME NOT NULL,
         access_level INTEGER NOT NULL,
         username varchar(50) NOT NULL,
         email varchar(100) NOT NULL,
-        token varchar(100) NOT NULL,
         data JSON);`);
     await connection.execute(`CREATE TABLE IF NOT EXISTS announcements (
         id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -42,9 +41,7 @@ async function main() {
         date DATETIME,
         title VARCHAR(200),
         data JSON);`);
-    await connection.execute(`CREATE TABLE IF NOT EXISTS admins (
-        id INTEGER PRIMARY KEY NOT NULL,
-    )`)
+    
     console.log("Finished");
     return;
     

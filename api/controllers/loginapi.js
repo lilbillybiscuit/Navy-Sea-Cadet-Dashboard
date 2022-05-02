@@ -15,7 +15,8 @@ const connection = mysql.createConnection({
 
 exports.authenicate = async function(request, result) {
 	var username = request.body.username;
-	var password = request.body.password;
+	var password = request.body.password; //should already be sha256'ed
+	var password = request.body 
 	if (username && password) {
 		connection.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [username, password], function(error, results, fields) {
 			if (error) throw error;
