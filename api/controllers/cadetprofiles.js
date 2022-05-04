@@ -1,58 +1,103 @@
-var mysql = require('mysql2');
-var fs = require("fs");
+let config = require('../../config');
+const tools = require('../tools')
+var QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
+var JSDOM = require('jsdom').JSDOM;
+var quillconfig = {
+  inlineStyles: true,
 
-let rawdata = fs.readFileSync('config.json');
-let config = JSON.parse(rawdata);
+};
+const database = require('../db');
+const cadetcollection= database.getdatabase().collection('cadet_profiles');
+const metadatacollection = database.getdatabase().collection('metadata');
 
-const pool = mysql.createPool({
-    host: config.database.host,
-    user: config.database.user,
-    password: config.database.password,
-    database: config.database.database;
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    decimalNumbers: true
-});
-
-const poolpromise = pool.promise();
 
 exports.add_cadet_profile = async function (request, result) {
     if (!'token' in request.query) {
-        var ret = {
-            success: false,
-            message: "Mussed be logged in to add a cadet profile..."
-        };
-        result.json(ret);
-        return;
+    var ret = {
+        success: false,
+        message: "Must be logged in to add a cadet.",
     }
-    if (token.length!=64) {
-        var ret = {
-            success: false,
-            message: "Invalid token",
-        };
-        result.json(ret);
-        return;
+    result.json(ret);
+    return;
+    }
+    var verify = await this.verify_token(request.query.token);
+    if (!verify.success) {
+    result.json({
+        success: false,
+        message: "Invalid token or insufficient permissions",
+    });
+    }
+    var data = JSON.parse(request.body);
+    var name = data.name;
+    var role = data.role;
+    var deltas = data.deltas;
+    var converter = new QuillDeltaToHtmlConverter(deltas, quillconfig);
+    var html = converter.convert();
+    var thiscount = tools.get_counter_and_update("cadet_profiles");
+    var profile = {
+        _id: thiscount,
+        name: name,
+        role: role,
+        dateadded: new Date(),
+        user: verify.username,
+        deltas: deltas,
+        html: html,
+        shortdescript: JSDOM.fragment(html).textContent.substring(0,200),
     }
 
-    //Token verification code goes here
-    var profile = request.query;
-    await poolpromise.query("INSERT INTO profiles (name, branch, data)");
-    var data = {
-        description: profile.description,
-        picture: profile.picture;
+    var inserted = await cadetcollection.insertOne(profile);
+    if (insert.insertedId= null) {
+        result.json({
+            success: false,
+            message: "Something went wrong while creating the profile"
+        });
     }
     
+    var ret = {
+        success: true,
+        url: "/cadet_profiles/profile?id=" + thiscount,
+    }
+    result.json(ret);
+    return;
+
 }
 
-
-data = {
-    name: "string",
-    description: "string",
-    branch: "string",
-    picture: "string",
-    age: 6
+exports.get_cadet = async function (request, result) {
+    var id= parseInt(request.query.id);
+    var profile = await cadetcollection.findOne({_id: id});
+    if (profile === null) {
+        result.json({
+        success: false,
+        message: "Cadet not found",
+        });
+    }
+    var ret={
+        date: new Date(),
+        id: profile.id,
+        title: profile.title,
+        dateadded: profile.dateadded,
+        html: profile.html,
+    }
+    result.json(ret);
+    return;
 }
 
-//
-preivew: name, profile pictrue, learn more
+exports.get_raw_cadet = async function (request, result) {
+    var id= parseInt(request.query.id);
+    var profile = await cadetcollection.findOne({_id: id});
+    if (profile === null) {
+        result.json({
+        success: false,
+        message: "Cadet not found",
+        });
+    }
+    var ret={
+        date: new Date(),
+        id: profile.id,
+        title: profile.title,
+        dateadded: profile.dateadded,
+        deltas: profile.deltas,
+    }
+    result.json(ret);
+    return;
+}

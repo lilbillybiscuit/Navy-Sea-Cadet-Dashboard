@@ -1,25 +1,21 @@
-const mysql = require('mysql2');
-const fs = require('fs');
+const database = require("./api/db");
 
-const pool = require("./api/db");
-const poolpromise = pool.promise();
-
-const tools = require("./api/tools");
-
-let rawdata = fs.readFileSync('config.json');
-let config = JSON.parse(rawdata);
-
-main().then(() => process.exit(0));
-async function main() {
-    var hi=await poolpromise.query("SELECT * FROM testtable");
-    console.log(hi[0]);
-    var datains=[
-        tools.generate_string(100), //token
-        tools.get_expires(12),
-        10,
-        "user2",
-        "email2",
-        JSON.stringify({hi:5})
-    ]
-    await poolpromise.query("INSERT INTO sessions (token, expires, access_level, username, email, data) VALUES (?,?,?,?,?,?)", datains);
-}
+database.connect()
+    .then(() => console.log("Connected to database"))
+    .then(() => {return database.get()})
+    .then(async function(db) {
+        const tools = require('./api/tools');
+        var hi = await tools.new_token_test('test');
+        console.log(hi);
+        // var res = await db.db('navysea').collection('test').insertOne({
+        //     _id: 0,
+        //     title: "Hello",
+        //     dateadded: new Date(),
+        //     user: "testuser",
+        //     "deltas": {test:"delta"},
+        //     html: "<p>This is a test</p>",
+        //     shortdescript: "This is a test",
+        // });
+        // console.log(res);
+        // db.close();
+    })

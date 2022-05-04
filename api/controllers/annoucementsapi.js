@@ -1,75 +1,96 @@
-var mysql = require('mysql2');
-var fs = require('fs');
+let config = require('../../config');
+const tools = require('../tools')
+var QuillDeltaToHtmlConverter = require('quill-delta-to-html').QuillDeltaToHtmlConverter;
+var JSDOM = require('jsdom').JSDOM;
+var quillconfig = {
+  inlineStyles: true,
 
-let rawdata = fs.readFileSync('config.json');
-let config = JSON.parse(rawdata);
-
-const pool = require("../db");
-const poolpromise = pool.promise();
+};
+const database = require('../db');
+const announcementcollection = database.getdatabase().collection('announcements');
+const metadatacollection = database.getdatabase().collection('metadata');
 
 exports.get_announcements_list = async function(request, result) {
-  var page = request.query.page;
+  var latest_page = (await tools.get_counter("announcements"))-1;
+  console.log(latest_page);
+  var page = request.query.page-1;
   var amount = request.query.amount;
-  var minimum = amount*page, maximum = minimum+amount-1;
-  var announcements = await poolpromise.query("SELECT * FROM test WHERE id BETWEEN ? AND ?", [minimum, maximum]);
-  announcements = annoucements[0];
-  if (announcements == null) {
+  page=Math.max(0,page);
+  amount=Math.max(0,amount);
+  var maximum = latest_page-amount*page, minimum = maximum-amount+1;
+  var announcements = await announcementcollection.find({_id: {$gte: minimum, $lte: maximum}}).toArray();
+  console.log(minimum);
+  console.log(maximum);
+  if (announcements.length==0) {
     result.json({
       success: false,
-      message: "Nothing has been posted yet",
+      message: "Nothing has been posted yet (or this range is incorrect)",
       messageshort: "NoMessage"
     });
     return;
   }
+  announcements.sort((a,b) => {return b._id-a._id});
   var ret = {
-        date: new Date(),
-        elements: [],
-    };
+    success:true,
+    date: new Date(),
+    announcements: [],
+  };
+
   for (var i=0; i<announcements.length; i++) {
     var temp = {
+      _id: announcements[i]._id,
       title: announcements[i].title,
-      summary: announcements[i].summary,
-      dateadded: announcements.dateadded,
-      imageurl: announcements[i].data.imageurl,
-      url: '/api/announcements/' + announcements[i].id
+      dateadded: announcements[i].dateadded,
+      shortdescript: announcements[i].shortdescript,
     }
-    ret.elements.push(temp);
+    ret.announcements.push(temp);
   }
-
-  for (var i=0; i<ret.elements.length; i++) {
-    var temp = {
-      title: ret.elements,
-      summary: "hi"
-    }
-    ret.elements.push(temp);
-  }
-  // console.log(temp);
-  // for (var i=0; i<temp[0].length; i++) {
-  //   console.log(temp[0][i]);
-  // }
-  
-  // for (var i=0; i<temp[0].length; i++) {
-  //   ret.elements.push(temp[0][i]);
-  // }
   result.json(ret);
+  return;
 };
 
 exports.get_announcement = async function(request, result) {
   var id= parseInt(request.query.id);
-  var announcement = await poolpromise.query("SELECT * FROM announcement WHERE id=?", [id])
-  announcement = announcement[0][0];
+  var announcement = await announcementcollection.findOne({_id: id});
+  if (announcement === null) {
+    result.json({
+      success: false,
+      message: "Announcement not found",
+    });
+  }
+  var ret={
+    date: new Date(),
+    id: announcement._id,
+    title: announcement.title,
+    dateadded: announcement.dateadded,
+    html: announcement.html,
+  }
+  result.json(ret);
+  return;
+}
+
+exports.get_raw_announcement = async function(request, result) {
+  var id= parseInt(request.query.id);
+  var announcement = await announcementcollection.findOne({_id: id});
+  if (announcement === null) {
+    result.json({
+      success: false,
+      message: "Announcement not found",
+    });
+  }
   var ret={
     date: new Date(),
     id: announcement.id,
     title: announcement.title,
     dateadded: announcement.dateadded,
-    content: announcement.data.content,
+    deltas: announcement.deltas,
   }
-  ret.json(ret);
+  result.json(ret);
+  return;
 }
 
 exports.add_announcement = async function(request, result) {
-  if (!'token' in request.query) {
+  if (typeof request.query.token == "undefined") {
     var ret = {
       success: false,
       message: "Must be logged in to add an announcement.",
@@ -77,52 +98,43 @@ exports.add_announcement = async function(request, result) {
     result.json(ret);
     return;
   }
-
-  if (token.length !=64) {
-    var ret = {
+  var verify = await tools.verify_token(request.query.token);
+  if (false&&!verify.success) {
+    result.json({
       success: false,
-      message: "Invalid token",
-    }
-    result.json(ret);
-    return;
-  }
-
-  var verify = await poolpromise.query("SELECT access_level, expires FROM tokens WHERE token=?",[request.query.token]);
-  verify = verify[0];
-  if (verify.length === 0) {
-    result.json({
-      sucesss:false,
-      message: "Invalid token",
+      message: "Invalid token or insufficient permissions",
     });
     return;
   }
-  if (verify.access_level <1) {
+  var data = request.body;
+  var title = data.title;
+  var deltas = data.deltas;
+  var converter = new QuillDeltaToHtmlConverter(deltas, quillconfig);
+  var html = converter.convert();
+  var thiscount = await tools.get_counter_and_update("announcements");
+  var announcement = {
+    _id: thiscount,
+    title: title,
+    dateadded: new Date(),
+    user: verify.username,
+    deltas: deltas,
+    html: html,
+    shortdescript: JSDOM.fragment(html).textContent.substring(0,200),
+  }
+
+  var inserted = await announcementcollection.insertOne(announcement);
+  if (inserted.insertedId= null) {
     result.json({
-      sucesss:false,
-      message: "Insufficient permissions",
+      success: false,
+      message: "Something went wrong while inserting the announcement"
     });
     return;
   }
-  if (verify.expires>=Date.now()) {
-    var ret = {
-      success:false,
-      message: "Login expired"
-    }
-    await poolpromise.query("SELECT WHERE token=?",[request.query.token]);
-    result.json(ret);
-    return;
-  }
-  var announcement = request.query;
-  await poolpromise.query("INSERT INTO announcements (title, summary, dateadded, data) VALUES (?,?,?,?)",
-  [announcement.title, announcement.summary, Date.now(),JSON.stringify({
-    content: announcement.content,
-    imageurl: 'imageurl' in announcement? annoucement.imageurl: null,
-  })]);
-
-
-  result.json({
+  var ret = {
     success: true,
-    message: "Announcement added!"
-  });
+    url: "/announcements/announcement?id=" + thiscount,
+    apiurl:"/api/announcement?id=" + thiscount,
+  }
+  result.json(ret);
   return;
 }
