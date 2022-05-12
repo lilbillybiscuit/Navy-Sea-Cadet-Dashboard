@@ -99,7 +99,7 @@ exports.add_announcement = async function(request, result) {
     return;
   }
   var verify = await tools.verify_token(request.query.token);
-  if (false&&!verify.success) {
+  if (!verify.success) {
     result.json({
       success: false,
       message: "Invalid token or insufficient permissions",

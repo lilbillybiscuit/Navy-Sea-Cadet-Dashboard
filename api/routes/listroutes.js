@@ -6,6 +6,7 @@ module.exports = function(app) {
   var controller = require('../controllers/apicontroller');
   var announcements = require('../controllers/annoucementsapi.js');
   var loginapi = require('../login/loginapi.js');
+  var cadetapi = require('../controllers/cadetprofiles.js');
 
   // copy paste these to make a new route
   app.route('/api/getlist') //Handle request for [domain]/api/getlist
@@ -26,6 +27,9 @@ module.exports = function(app) {
     .post(loginapi.simplelogin);
   app.route('/api/check_token')
     .post(loginapi.get_session);
+  app.route('/api/add_cadet')
+    .post(cadetapi.add_cadet_profile);
+  
   // app.route('/api/authenicate')
   //   .post(loginapi.authenticate);
 };
