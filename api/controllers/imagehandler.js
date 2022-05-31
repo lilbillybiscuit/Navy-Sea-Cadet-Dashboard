@@ -1,7 +1,3 @@
-const fs = require('fs');
+const fs = require("fs");
 
-
-
-exports.get_image = function(request, result) {
-    
-}
+exports.get_image = function (request, result) {};
