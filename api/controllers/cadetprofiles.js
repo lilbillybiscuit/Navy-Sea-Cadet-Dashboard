@@ -36,11 +36,11 @@ exports.add_cadet_profile = async function (request, result) {
     var email = data.email;
     var role = data.role;
     var deltas = data.deltas;
-    var base64image = data.base64image;
-    var sha256 = crypto.createHash('sha256').update(base64image).digest('hex');
-    var randomstring = tools.generate_string(10);
-    var imagefileurl = `/images/${sha256.substring(0,2)}/${sha256.substring(2,4)}/${sha256.substring(4,6)}/${randomstring}.jpg`;
-    fs.writeFileSync(imagefileurl,base64image);
+    //var base64image = data.base64image;
+    //var sha256 = crypto.createHash('sha256').update(base64image).digest('hex');
+    //var randomstring = tools.generate_string(10);
+    //var imagefileurl = `/images/${sha256.substring(0,2)}/${sha256.substring(2,4)}/${sha256.substring(4,6)}/${randomstring}.jpg`;
+    //fs.writeFileSync(imagefileurl,base64image);
     var converter = new QuillDeltaToHtmlConverter(deltas, quillconfig);
     var html = converter.convert();
     var thiscount = await tools.get_counter_and_update("cadet_profiles");

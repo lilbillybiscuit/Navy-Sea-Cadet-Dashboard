@@ -77,7 +77,7 @@ exports.new_token_test = async function (username) {
 }
 exports.generate_string = function (len) {
     var token = crypto.randomBytes(Math.ceil(len*3/4)).toString('base64');
-    return token.substring(0,len);
+    return token.substring(0,len).replaceAll('+', '=').replaceAll('/', '-');
 }
 
 exports.get_expires = function(hours_ahead) {

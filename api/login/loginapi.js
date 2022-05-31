@@ -1,7 +1,7 @@
 var database = require('../db');
 var tools = require('../tools');
 var accountcollection = database.getdatabase().collection('accounts');
-
+var sessioncollection = database.getdatabase().collection('sessions');
 
 exports.simplelogin = async function(request, result) {
 	var username = request.body.username;
@@ -32,6 +32,24 @@ exports.simplelogin = async function(request, result) {
 		result.json({
 			success:false,
 			message:"Missing username and/or password"
+		});
+		return;
+	}
+}
+
+exports.simplelogout = async function(request, result) {
+	var token = request.body.token;
+	if (token) {
+		await sessioncollection.deleteOne({token:token});
+		result.json({
+			success: true,
+			message: 'Logged out'
+		});
+		return;
+	} else {
+		result.json({
+			success: false,
+			message: 'Missing token'
 		});
 		return;
 	}

@@ -59,6 +59,7 @@ exports.get_announcement = async function(request, result) {
     });
   }
   var ret={
+    success: true,
     date: new Date(),
     id: announcement._id,
     title: announcement.title,
@@ -79,8 +80,9 @@ exports.get_raw_announcement = async function(request, result) {
     });
   }
   var ret={
+    success: true,
     date: new Date(),
-    id: announcement.id,
+    id: announcement._id,
     title: announcement.title,
     dateadded: announcement.dateadded,
     deltas: announcement.deltas,
@@ -132,8 +134,68 @@ exports.add_announcement = async function(request, result) {
   }
   var ret = {
     success: true,
-    url: "/announcements/announcement?id=" + thiscount,
-    apiurl:"/api/announcement?id=" + thiscount,
+    id: thiscount,
+    url: "/Dashboard/announcements/view.html?id=" + thiscount,
+    publicurl: "/announcements/view?id="+thiscount,
+    apiurl:"/api/announcements/get?id=" + thiscount,
+  }
+  result.json(ret);
+  return;
+}
+
+exports.update_announcement = async function(request, result) {
+  if (typeof request.query.token == "undefined") {
+    var ret = {
+      success: false,
+      message: "Must be logged in to add an announcement.",
+    }
+    result.json(ret);
+    return;
+  }
+  var verify = await tools.verify_token(request.query.token);
+  if (!verify.success) {
+    result.json({
+      success: false,
+      message: "Invalid token or insufficient permissions",
+    });
+    return;
+  }
+  if (typeof request.query.id == "undefined") {
+    result.json({
+      success: false,
+      message: "No announcement id specified",
+    });
+    return;
+  }
+  
+  var data = request.body;
+  var title = data.title;
+  var deltas = data.deltas;
+  var id = parseInt(request.query.id);
+  var converter = new QuillDeltaToHtmlConverter(deltas, quillconfig);
+  var html = converter.convert();
+  var updated = {
+    title: title,
+    dateupdated: new Date(),
+    deltas: deltas,
+    html: html,
+    shortdescript: JSDOM.fragment(html).textContent.substring(0,200),
+  }
+  var query = {_id: id};
+  var inserted = await announcementcollection.updateOne(query, {$set:updated});
+  if (inserted.insertedId= null) {
+    result.json({
+      success: false,
+      message: "Something went wrong while inserting the announcement"
+    });
+    return;
+  }
+  var ret = {
+    success: true,
+    id: id,
+    url: "/Dashboard/announcements/view.html?id=" + id,
+    publicurl: "/announcements/view?id="+id,
+    apiurl:"/api/announcements/get?id=" + id,
   }
   result.json(ret);
   return;

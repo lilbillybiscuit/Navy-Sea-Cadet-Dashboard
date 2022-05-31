@@ -30,3 +30,12 @@ send this from client:
     image: url (idk if needed but can add if needed, just need to bash out a image saving system)
 }
 ```
+
+
+# HTML Notes
+Unread Message Badge:
+assign id "unread_messages_count" to tag with number
+remove 54 from the element (make the default blank)
+
+Change add announcements hyperlink to "announcements/create_announcement.html" or whatever it is
+
