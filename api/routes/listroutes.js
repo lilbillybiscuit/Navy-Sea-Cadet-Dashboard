@@ -31,6 +31,10 @@ module.exports = function(app) {
   //Cadets API
   app.route('/api/cadets/create')
     .post(cadetapi.add_cadet_profile);
+  app.route('/api/cadets/get')
+    .get(cadetapi.get_cadet);
+  app.route('/api/cadets/edit')
+    .get(cadetapi.get_raw_cadet);
 
   //Announcements API
   app.route('/api/announcements/list')

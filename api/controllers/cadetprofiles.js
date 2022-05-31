@@ -85,6 +85,7 @@ exports.get_cadet = async function (request, result) {
     }
     var ret={
         date: new Date(),
+        success: true,
         id: profile._id,
         firstname: profile.firstname,
         lastname: profile.lastname,
@@ -108,6 +109,7 @@ exports.get_raw_cadet = async function (request, result) {
     }
     var ret={
         date: new Date(),
+        success: true,
         id: profile._id,
         firstname: profile.firstname,
         lastname: profile.lastname,
@@ -118,3 +120,70 @@ exports.get_raw_cadet = async function (request, result) {
     result.json(ret);
     return;
 }
+
+
+//Updated on 5/31/2022 at 2:25am
+exports.update_cadet_profile = async function(request, result) {
+    if (typeof request.query.token == "undefined") {
+      var ret = {
+        success: false,
+        message: "Must be logged in to add an announcement.",
+      }
+      result.json(ret);
+      return;
+    }
+    var verify = await tools.verify_token(request.query.token);
+    if (!verify.success) {
+      result.json({
+        success: false,
+        message: "Invalid token or insufficient permissions",
+      });
+      return;
+    }
+    if (typeof request.query.id == "undefined") {
+      result.json({
+        success: false,
+        message: "No cadet id specified",
+      });
+      return;
+    }
+    
+    var data = request.body;
+    var firstname = data.firstname;
+    var lastname = data.lastname;
+    var email = data.email;
+    var role = data.role;
+    var deltas = data.deltas;
+    var id = parseInt(request.query.id);
+    var converter = new QuillDeltaToHtmlConverter(deltas, quillconfig);
+    var html = converter.convert();
+
+    var updated = {
+      firstname: firstname,
+      lastname: lastname,
+      role: role,
+      dateupdated: new Date(),
+      deltas: deltas,
+      email: email,
+      html: html,
+      shortdescript: JSDOM.fragment(html).textContent.substring(0,200),
+    }
+    var query = {_id: id};
+    var inserted = await cadetcollection.updateOne(query, {$set:updated});
+    if (inserted.insertedId= null) {
+      result.json({
+        success: false,
+        message: "Something went wrong while inserting the cadet"
+      });
+      return;
+    }
+    var ret = {
+      success: true,
+      id: id,
+      url: "/Dashboard/cadets/view.html?id=" + id,
+      publicurl: "/cadets/view?id="+id,
+      apiurl:"/api/cadets/get?id=" + id,
+    }
+    result.json(ret);
+    return;
+  }
