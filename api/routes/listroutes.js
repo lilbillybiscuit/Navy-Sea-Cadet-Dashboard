@@ -9,13 +9,12 @@ module.exports = function (app) {
   var cadetapi = require("../controllers/cadetprofiles.js");
   var dashboardapi = require("../controllers/dashboard.js");
   var messageapi = require("../controllers/messages.js");
+  var calendarapi = require("../controllers/calendar.js");
   // copy paste these to make a new route
-  app
-    .route("/api/getlist") //Handle request for [domain]/api/getlist
+  app.route("/api/getlist") //Handle request for [domain]/api/getlist
     .get(controller.example_task);
 
-  app
-    .route("/api/cadet/:userid") //Handle request for [domain]/api/cadet/[user_id]
+  app.route("/api/cadet/:userid") //Handle request for [domain]/api/cadet/[user_id]
     .get(controller.get_cadet_info);
 
   app.route("/api/login").post(loginapi.simplelogin);
@@ -26,10 +25,14 @@ module.exports = function (app) {
     .route("/api/get_unread_message_count")
     .get(messageapi.get_unread_message_count);
 
+  //Calendar API
+  app.route("/api/calendar/url").get(calendarapi.get_calendar_url);
+
   //Cadets API
   app.route("/api/cadets/create").post(cadetapi.add_cadet_profile);
   app.route("/api/cadets/get").get(cadetapi.get_cadet);
   app.route("/api/cadets/edit").get(cadetapi.get_raw_cadet);
+  app.route("/api/cadets/update").post(cadetapi.update_cadet_profile);
 
   //Announcements API
   app

@@ -98,7 +98,7 @@ exports.authenicate = async function (request, result) {
         if (results.length > 0) {
           request.session.loggedin = true;
           request.session.username = username;
-          result.redirect("/Dashboard/dashboard.html");
+          result.redirect("/dashboard/dashboard.html");
         } else {
           result.send("Invalid username and/or password");
         }

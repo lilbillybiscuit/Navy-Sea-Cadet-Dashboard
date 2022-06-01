@@ -111,6 +111,7 @@ exports.get_raw_cadet = async function (request, result) {
     id: profile._id,
     firstname: profile.firstname,
     lastname: profile.lastname,
+    email: profile.email,
     role: profile.role,
     dateadded: profile.dateadded,
     deltas: profile.deltas,
@@ -177,7 +178,7 @@ exports.update_cadet_profile = async function (request, result) {
   var ret = {
     success: true,
     id: id,
-    url: "/Dashboard/cadets/view.html?id=" + id,
+    url: "/dashboard/cadets/view.html?id=" + id,
     publicurl: "/cadets/view?id=" + id,
     apiurl: "/api/cadets/get?id=" + id,
   };

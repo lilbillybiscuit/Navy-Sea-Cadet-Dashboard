@@ -40,6 +40,7 @@ exports.get_announcements_list = async function (request, result) {
   var ret = {
     success: true,
     date: new Date(),
+    count: latest_page,
     announcements: [],
   };
 
@@ -142,7 +143,7 @@ exports.add_announcement = async function (request, result) {
   var ret = {
     success: true,
     id: thiscount,
-    url: "/Dashboard/announcements/view.html?id=" + thiscount,
+    url: "/dashboard/announcements/view.html?id=" + thiscount,
     publicurl: "/announcements/view?id=" + thiscount,
     apiurl: "/api/announcements/get?id=" + thiscount,
   };
@@ -202,10 +203,61 @@ exports.update_announcement = async function (request, result) {
   var ret = {
     success: true,
     id: id,
-    url: "/Dashboard/announcements/view.html?id=" + id,
+    url: "/dashboard/announcements/view.html?id=" + id,
     publicurl: "/announcements/view?id=" + id,
     apiurl: "/api/announcements/get?id=" + id,
   };
   result.json(ret);
   return;
 };
+
+
+//3 parameters: token, id, confirm
+exports.delete_announcement = async function(request, result) {
+  if (typeof request.query.token == "undefined") {
+    var ret = {
+      success: false,
+      message: "Must be logged in to add an announcement.",
+    };
+    result.json(ret);
+    return;
+  }
+  var verify = await tools.verify_token(request.query.token);
+  if (!verify.success) {
+    result.json({
+      success: false,
+      message: "Invalid token or insufficient permissions",
+    });
+    return;
+  }
+  if (typeof request.query.id == "undefined") {
+    result.json({
+      success: false,
+      message: "No announcement id specified",
+    });
+    return;
+  }
+  if (typeof request.query.confirm == "undefined" || request.query.confirm != "true") {
+    result.json({
+      success: false,
+      message: "Unconfirmed deletion",
+    });
+    return;
+  }
+  var id = parseInt(request.query.id);
+  var query = { _id: id };
+  var deleted = await announcementcollection.deleteOne(query);
+  if ((deleted.deletedCount = null)) {
+    result.json({
+      success: false,
+      message: "Nothing deleted",
+    });
+    return;
+  }
+  var ret = {
+    success: true,
+    id: id,
+  };
+  result.json(ret);
+  return;
+}

@@ -20,4 +20,6 @@ sed -i -r -z 's/#?; ?#//g; s/(server \{)\n    ssl off;/\1/g' /etc/nginx/sites-av
 sudo nginx -t && sudo systemctl reload nginx
 echo -e '#!/bin/bash\nnginx -t && systemctl reload nginx' | sudo tee /etc/letsencrypt/renewal-hooks/post/nginx-reload.sh
 sudo chmod a+x /etc/letsencrypt/renewal-hooks/post/nginx-reload.sh
+#Turn on Server Side Include
+sed -i 's/index.html;/index.html; ssi on;/' /etc/nginx/sites-available/navysea.lilbillbiscuit.com.conf
 sudo nginx -t && sudo systemctl reload nginx
