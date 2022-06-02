@@ -40,7 +40,7 @@ exports.get_announcements_list = async function (request, result) {
   var ret = {
     success: true,
     date: new Date(),
-    count: latest_page,
+    count: latest_page+1,
     announcements: [],
   };
 

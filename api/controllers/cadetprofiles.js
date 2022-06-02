@@ -11,6 +11,55 @@ const database = require("../db");
 const cadetcollection = database.getdatabase().collection("cadet_profiles");
 const metadatacollection = database.getdatabase().collection("metadata");
 
+exports.get_cadet_list= async function (request, result) {
+  var latest_page = (await tools.get_counter("cadet_profiles")) - 1;
+  console.log(latest_page);
+  var page = request.query.page - 1;
+  var amount = request.query.amount;
+  page = Math.max(0, page);
+  amount = Math.max(0, amount);
+  var maximum = latest_page - amount * page,
+    minimum = maximum - amount + 1;
+  var cadets = await cadetcollection
+    .find({ _id: { $gte: minimum, $lte: maximum } })
+    .toArray();
+  console.log(minimum);
+  console.log(maximum);
+  if (cadets.length == 0) {
+    result.json({
+      success: true,
+      count: latest_page+1,
+      cadets: [],
+      message: "No cadets have been created yet (or this range is incorrect)",
+      messageshort: "NoMessage",
+    });
+    return;
+  }
+  cadets.sort((a, b) => {
+    return b._id - a._id;
+  });
+  var ret = {
+    success: true,
+    date: new Date(),
+    count: latest_page+1,
+    cadets: [],
+  };
+
+  for (var i = 0; i < cadets.length; i++) {
+    var temp = {
+      _id: cadets[i]._id,
+      firstname: cadets[i].firstname,
+      lastname: cadets[i].lastname,
+      role: cadets[i].role,
+      shortdescript: cadets[i].shortdescript,
+    };
+    ret.cadets.push(temp);
+  }
+  result.json(ret);
+  return;
+};
+
+
 exports.add_cadet_profile = async function (request, result) {
   if (typeof request.query.token == "undefined") {
     var ret = {
