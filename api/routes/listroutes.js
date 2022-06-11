@@ -3,19 +3,17 @@ const con = null;
 //Don't worry about any of this function stuff, just add any routes below
 //by copying and pasting the code
 module.exports = function (app) {
-  var controller = require("../controllers/apicontroller");
   var announcements = require("../controllers/annoucementsapi.js");
   var loginapi = require("../login/loginapi.js");
   var cadetapi = require("../controllers/cadetprofiles.js");
   var dashboardapi = require("../controllers/dashboard.js");
   var messageapi = require("../controllers/messages.js");
   var calendarapi = require("../controllers/calendar.js");
-  // copy paste these to make a new route
-  app.route("/api/getlist") //Handle request for [domain]/api/getlist
-    .get(controller.example_task);
+  var fileapi= require("../controllers/filehandler.js");
+  var linksapi = require("../controllers/importantlinkshandler.js");
+  var imageapi = require("../controllers/imagehandler.js");
 
-  app.route("/api/cadet/:userid") //Handle request for [domain]/api/cadet/[user_id]
-    .get(controller.get_cadet_info);
+  //app.route("/api/cadet/:userid").get(controller.get_cadet_info); //Handle request for [domain]/api/cadet/[user_id]
 
   app.route("/api/login").post(loginapi.simplelogin);
   app.route("/api/logout").post(loginapi.simplelogout);
@@ -45,8 +43,23 @@ module.exports = function (app) {
   app
     .route("/api/announcements/update")
     .post(announcements.update_announcement);
+  
+  //File API
+  app.route("/api/documents/upload").post(fileapi.upload_document);
+  app.route("/api/documents/extensions").get(fileapi.document_extensions);
+  app.route("/api/documents/list").get(fileapi.list_documents);
+  app.route("/api/documents/delete").delete(fileapi.delete_document);
+
+  //Images API
+  app.route("/api/images/upload").post(imageapi.upload_image);
+
   //Message API
   app.route("/api/messages/count").get(messageapi.get_message_count);
   // app.route('/api/authenicate')
   //   .post(loginapi.authenticate);
+
+  //Item APIs
+  app.route("/api/links/edit").get(linksapi.get_links);
+  app.route("/api/links/update").post(linksapi.update_links);
+  app.route("/api/policy/get").get(fileapi.get_policies_url);
 };

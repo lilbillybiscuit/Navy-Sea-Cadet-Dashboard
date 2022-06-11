@@ -193,7 +193,7 @@ exports.update_announcement = async function (request, result) {
   var inserted = await announcementcollection.updateOne(query, {
     $set: updated,
   });
-  if ((inserted.insertedId = null)) {
+  if ((!inserted.acknowledged)) {
     result.json({
       success: false,
       message: "Something went wrong while inserting the announcement",
@@ -261,3 +261,5 @@ exports.delete_announcement = async function(request, result) {
   result.json(ret);
   return;
 }
+
+console.log("Initialized Announcements API");

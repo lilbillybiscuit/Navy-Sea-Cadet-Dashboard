@@ -46,3 +46,5 @@ exports.get_dashboard_info = async function (request, result) {
   result.json(data);
   return;
 };
+
+console.log("Initialized Dashboard API");

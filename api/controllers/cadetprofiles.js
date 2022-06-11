@@ -234,3 +234,5 @@ exports.update_cadet_profile = async function (request, result) {
   result.json(ret);
   return;
 };
+
+console.log("Initialized Cadet API");

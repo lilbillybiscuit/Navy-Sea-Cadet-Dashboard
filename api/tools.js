@@ -4,6 +4,34 @@ var accountcollection = database.collection("accounts");
 var metadatacollection = database.collection("metadata");
 const crypto = require("crypto");
 
+exports.verify_token2 = async function (token) {
+  if (typeof token == "undefined") {
+    return {
+      success: false,
+      ret: {
+        success: false,
+        message: "Not logged in"
+      }
+    };
+  }
+  var verify = this.verify_token(token);
+  if (!verify.success) {
+    return {
+      success: false,
+      ret: {
+        success: false,
+        message: "Invalid token"
+      }
+    };
+  }
+  return {
+    success: true,
+    message: "Token verified",
+    access_level: verify.access_level,
+    username: verify.username
+  };
+};
+
 exports.verify_token = async function (token) {
   if (token.length != 100) {
     return {
@@ -80,6 +108,10 @@ exports.generate_string = function (len) {
   return token.substring(0, len).replaceAll("+", "=").replaceAll("/", "-");
 };
 
+exports.generate_hex = function (len) {
+  var token = crypto.randomBytes(Math.ceil(len/2)).toString("hex");
+  return token.substring(0, len);
+};
 exports.get_expires = function (hours_ahead) {
   var today = new Date();
   today.setHours(today.getHours() + hours_ahead);

@@ -13,3 +13,5 @@ exports.get_calendar_url = function(request, result) {
     url: config.googlecalendarurl
   });
 }
+
+console.log("Initialized Calendar API");
