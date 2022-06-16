@@ -1,3 +1,6 @@
 [submodule "NavyApp"]
 	path = NavyApp
 	url = https://github.com/CHSCodeForChange/NavyApp.git
+[submodule "NavyAppReact"]
+	path = NavyAppReact
+	url = https://github.com/lilbillybiscuit/NavyAppReact.git
