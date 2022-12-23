@@ -1,4 +1,14 @@
-# Navy-Sea-Cadet-Dashboard
+# Navy Sea Cadet Dashboard
+
+**A centralized hub to manage announcements, documents, and cadet profiles. Made for a division of the Navy.**
+
+Frontend written using plain **HTML**, **CSS**, **Javascript**; Backend built with **Express.js** and **MongoDB**
+
+Screenshot:
+![](media/homepage_screenshot.png)
+
+**Disclaimer** None of the above names are real.
+
 
 **Setting up the dev environment**
 1. Install Node.js 16.x for your operation system (make sure it also includes npm)
