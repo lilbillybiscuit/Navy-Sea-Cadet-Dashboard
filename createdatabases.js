@@ -1,6 +1,6 @@
 const mysql = require("mysql2/promise");
 const fs = require("fs");
-let rawdata = fs.readFileSync("config.json");
+let rawdata = fs.readFileSync("./config");
 let config = JSON.parse(rawdata);
 
 main().then(() => process.exit(0));
